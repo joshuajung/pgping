@@ -4,6 +4,7 @@ import * as pg from "pg";
 
 const connectionString = process.env.CONNECTION_STRING;
 const logdnaKey = process.env.LOGDNA_KEY;
+const disabled = process.env.DISABLED;
 var logger = Logger.createLogger(logdnaKey!);
 
 const ping = async () => {
@@ -18,5 +19,10 @@ const ping = async () => {
     ping();
   }, 1000);
 };
-ping();
+if (disabled) {
+  console.debug("Disabled");
+} else {
+  console.debug("Starting…");
+  ping();
+}
 http.createServer().listen(11999, "0.0.0.0");
