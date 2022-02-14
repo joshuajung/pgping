@@ -8,13 +8,16 @@ const disabled = process.env.DISABLED;
 var logger = Logger.createLogger(logdnaKey!);
 
 const ping = async () => {
-  const start = Date.now();
-  const connection = new pg.Client({ connectionString });
-  await connection.connect();
-  const delta = Date.now() - start;
-  console.debug("Pong after:", delta);
-  logger.log(`pgpong delta=${delta}`);
-  await connection.end();
+  try {
+    console.log("⚪️  PING");
+    const start = Date.now();
+    const connection = new pg.Client({ connectionString });
+    await connection.connect();
+    await connection.end();
+    const delta = Date.now() - start;
+    console.log("🟢  PONG after", delta);
+    logger.log(`[pgpong] delta=${delta}`);
+  } catch {}
   setTimeout(async () => {
     ping();
   }, 1000);
@@ -23,6 +26,7 @@ if (disabled) {
   console.debug("Disabled");
 } else {
   console.debug("Starting…");
+  logger.log(`[pgpong] start`);
   ping();
 }
-http.createServer().listen(11999, "0.0.0.0");
+http.createServer().listen(parseInt(process.env.PORT ?? "11999"), "0.0.0.0");
